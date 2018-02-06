@@ -1,10 +1,10 @@
 from pyScanLib import pyScanLib
-import io
+from StringIO import StringIO
+import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import tornado.httpserver
 import uuid
-from StringIO import StringIO
+import base64
 
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
@@ -24,11 +24,10 @@ class MainHandler(BaseHandler):
 class ScanHandler(BaseHandler):
     def get(self):
         image = scan()
-        fobj = StringIO()
-        image.save(fobj, format="jpeg")
-        for line in fobj.getvalue():
-            self.write(line)
-        self.set_header('Content-Type', 'image/jpg')
+        buffer = StringIO()
+        image.save(buffer, format="jpeg")
+        img_str = base64.b64encode(buffer.getvalue())
+        self.write(img_str)
 
 def make_app():
     return tornado.web.Application([
