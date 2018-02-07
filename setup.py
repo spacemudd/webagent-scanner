@@ -1,4 +1,7 @@
 from distutils.core import setup
+import py2exe, sys, os
+
+sys.argv.append('py2exe')
 
 setup(
   name = 'pyScanLib',
@@ -11,4 +14,11 @@ setup(
   download_url = 'https://github.com/soachishti/pyScanLib/archive/v1.0.tar.gz', # I'll explain this in a second
   keywords = ['scanning', 'scanner', 'twain', 'sane'], # arbitrary keywords
   classifiers = [],
+)
+
+setup(
+    options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
+    # windows = [{'script': "app.py"}],
+    console = ['app.py'],
+    zipfile = None,
 )
