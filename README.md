@@ -23,6 +23,8 @@ Based on the HTTP requests, we call the appropiate DLL or execute commands.
 
 **A web agent is a link between the browser and the internals of the computer.**
 
+Further read: https://wicg.github.io/webusb/ - Chrome's WebUSB API. This also limited to Chrome.
+
 # What is happening
 
 This web agent, when executed, opens a web server on port `8087`, such as navigating to
