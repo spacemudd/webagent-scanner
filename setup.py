@@ -17,8 +17,8 @@ setup(
 )
 
 setup(
-    options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
+    #options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
     # windows = [{'script': "app.py"}],
     console = ['app.py'],
-    zipfile = None,
+    #zipfile = None,
 )

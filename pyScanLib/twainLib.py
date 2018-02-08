@@ -68,9 +68,8 @@ class twainLib(object):
     def setPixelType(self, pixelType):
         """Set pixelType to selected scanner
 
-        Arguments:
-        pixelType -- Pixel type - bw (Black & White), gray (Gray) and color(Colored)
-
+        Args:
+        pixelType: String  bw / gray / color
         """
         pixelTypeMap = {'bw': twain.TWPT_BW,
                         'gray': twain.TWPT_GRAY,
@@ -94,6 +93,36 @@ class twainLib(object):
             return Image.open(StringIO(image))
         except:
             return False
+
+    def multiScan(self):
+        """ Scan and return an array of PIL objects 
+            If no images, will return an empty array
+        """
+        if self.scanner == None:
+            raise ScannerNotSet
+
+        self.scanner.RequestAcquire(0, 1) # RequestAcquire(ShowUI, ShowModal)
+        info = self.scanner.GetImageInfo()
+        images = []
+        handles = []
+        try:
+            handle, more = self.scanner.XferImageNatively()
+            handles.append(handle)
+        except twain.excDSTransferCancelled:
+            return []
+        while more != 0:
+            try:
+                handle, more = self.scanner.XferImageNatively()
+                handles.append(handle)
+            except twain.excDSTransferCancelled:
+                more = 0
+
+        for handle in handles:
+            images.append(Image.open(StringIO(twain.DIBToBMFile(handle))))
+            twain.GlobalHandleFree(handle)
+
+        return images
+
 
     def closeScanner(self):
         """ Destory 'self.scanner' class of twain module generated in setScanner function

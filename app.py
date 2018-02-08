@@ -1,10 +1,12 @@
 from pyScanLib import pyScanLib
 from StringIO import StringIO
+from fpdf import FPDF
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import uuid
 import base64
+import twain
 
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
@@ -19,20 +21,30 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
-        self.write("Hello, world")
+        self.write("Scanner Web-Agent")
 
 class ScanHandler(BaseHandler):
     def get(self):
-        image = scan()
+        try:
+            image = scan()
+        except transferCancelled:
+            self.write('Damn!')
+
         buffer = StringIO()
-        image.save(buffer, format="jpeg")
+        image.save(buffer, format = "jpeg")
         img_str = base64.b64encode(buffer.getvalue())
         self.write(img_str)
+
+class MultiScanHandler(BaseHandler):
+    def get(self):
+        images = multiScan()
+        self.write(images)
 
 def make_app():
     return tornado.web.Application([
         (r"/", MainHandler),
-        (r"/scan", ScanHandler)
+        (r"/scan", ScanHandler),
+        (r"/multi-scan", MultiScanHandler),
     ])
 
 def main():
@@ -45,25 +57,58 @@ def main():
     print "Serving on 8087..."
     tornado.ioloop.IOLoop.current().start()
 
+class transferCancelled(Exception):
+    pass
 
 def scan():
-    loadScanner = pyScanLib() # load scanner library
+    loadScanner = pyScanLib()
     devices = loadScanner.getScanners()
     loadScanner.setScanner(devices[0])
 
     loadScanner.setDPI(300)
 
-    # A4 Example
-    loadScanner.setScanArea(width=8.26,height=11.693) # (left,top,width,height) in inches
+    # loadScanner.setScanArea(width=8.26,height=11.693) # (left,top,width,height) in inches (A4)
 
     loadScanner.setPixelType("color") # bw/gray/color
 
     pil = loadScanner.scan()
 
-    loadScanner.closeScanner() # unselect selected scanner, set in setScanners()
-    loadScanner.close() # Destory whole class
+    if not pil:
+        raise transferCancelled
+
+    loadScanner.closeScanner()
+    loadScanner.close()
 
     return pil
+
+def multiScan():
+    """ Returns a list of images (PIL in Array) scanned.
+    """
+    loadScanner = pyScanLib()
+    devices = loadScanner.getScanners()
+    loadScanner.setScanner(devices[0])
+
+    loadScanner.setDPI(300)
+
+    #loadScanner.setScanArea(width=8.26,height=11.693) # (left,top,width,height) in inches (A4)
+
+    loadScanner.setPixelType('color') # bw/gray/color
+
+    pils = loadScanner.multiScan()
+
+    loadScanner.closeScanner()
+    loadScanner.close()
+
+    imagesArray = []
+    for pil in pils:
+        buffer = StringIO()
+        pil.save(buffer, format = 'JPEG')
+        img_str = base64.b64encode(buffer.getvalue())
+        imagesArray.append(img_str)
+
+    imagesDict = {'images': imagesArray, 'total': len(imagesArray)}
+
+    return imagesDict
 
 if __name__ == '__main__':
     main()

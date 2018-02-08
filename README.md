@@ -1,3 +1,77 @@
+# Usage
+
+1. In command prompt, navigate to the project's root and run `app.py`.
+
+2. Make sure `app.py` is serving.
+
+2. In your web application(s), call a simple Ajax GET request to localhost:8087 (see below section).
+
+# API
+
+## /scan
+
+**Description**
+
+Selects the **first** scanner the app finds and begins the scanning call.
+
+**Request example**
+
+    $.support.cors = true;
+
+    $.ajax({
+        crossDomain: true,
+        type : "GET",
+        url : "https://localhost:8087/scan",
+        dataType : "json",
+        success : function(response) {
+            console.log(response.data) // base64 encoded image
+        },
+    });
+
+**Response example**
+
+String. Base64 encoded string of a single JPEG image.
+
+## /multi-scan
+
+**Description**
+
+Selects the **first** scanner the app finds and begin scanning until all papers are scanned.
+
+**Request example**
+
+    $.support.cors = true;
+
+    $.ajax({
+        crossDomain: true,
+        type : "GET",
+        url : "https://localhost:8087/multi-scan",
+        success : function(response) {
+            console.log(result.data.images); // An array of base64 encoded strings.
+            console.log('total:' + result.data.total); // Total images scanned.
+        },
+    });
+
+
+**Example response**
+
+    {
+        'images': {
+            base64 encoded string,
+            base64 encoded string,
+            ...
+        },
+        'total': 10
+    }
+
+
+# How to build
+
+1. Run `python setup.py py2exe`
+2. Once compiled, navigate to `dist`, and open `app.exe`.
+
+If you plan to take app.exe somewhere else, it must have the folder 'cert' next to it 
+with the certificate files.
 
 # Reason this repo exists
 
@@ -31,23 +105,14 @@ This web agent, when executed, opens a web server on port `8087`, such as naviga
 `https://localhost:8087` will allow you to communicate with the app and return the
 appropriate response.
 
-# How to build
+# Code documentation style
 
-1. Run `python setup.py py2exe`
-2. Once compiled, navigate to `dist`, and open `app.exe`.
-
-If you plan to take app.exe somewhere else, it must have the folder 'cert' next to it 
-with the certificate files.
-
-# Usage
-
-In your web applications, call an ajax GET request to:
-
-`https://localhost:8087/scan`
-
-The response will be a base64 encoded JPG image.
-  
+This project will use [Sphinx](https://pythonhosted.org/an_example_pypi_project/sphinx.html).
 
 # Disclaimer
 
-Be warned, I'm a rookie in Python.
+I'm a rookie in Python.
+
+# License
+
+This package is open-sourced software licensed under the MIT license.
