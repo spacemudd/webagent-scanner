@@ -8,7 +8,9 @@
 
 # API
 
-## /scan
+All communicaction are in HTTPS GET requests format.
+
+> /scan
 
 **Description**
 
@@ -32,7 +34,7 @@ Selects the **first** scanner the app finds and begins the scanning call.
 
 String. Base64 encoded string of a single JPEG image.
 
-## /multi-scan
+> /multi-scan
 
 **Description**
 
@@ -47,8 +49,8 @@ Selects the **first** scanner the app finds and begin scanning until all papers 
         type : "GET",
         url : "https://localhost:8087/multi-scan",
         success : function(response) {
-            console.log(result.data.images); // An array of base64 encoded strings.
-            console.log('total:' + result.data.total); // Total images scanned.
+            console.log(response.data.images); // An array of base64 encoded strings.
+            console.log('total:' + response.data.total); // Total images scanned.
         },
     });
 
@@ -105,14 +107,24 @@ This web agent, when executed, opens a web server on port `8087`, such as naviga
 `https://localhost:8087` will allow you to communicate with the app and return the
 appropriate response.
 
+# Roadmap
+
+- Prepare 
+
+- A GUI for the web agent.
+- Web agent can be minimized to tray.
+- Allow web agent to be added to the system's startup & be minimized on boot.
+- Work on API.
+
 # Code documentation style
 
 This project will use [Sphinx](https://pythonhosted.org/an_example_pypi_project/sphinx.html).
 
-# Disclaimer
-
-I'm a rookie in Python.
-
 # License
 
 This package is open-sourced software licensed under the MIT license.
+
+# Credit
+
+[saochishti](https://github.com/soachishti) - https://github.com/soachishti/pyScanLib
+[chmuche](https://github.com/chmuche) - https://github.com/ndp-systemes/pyScanLib (multi-page scan code)
