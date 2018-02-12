@@ -109,8 +109,6 @@ appropriate response.
 
 # Roadmap
 
-- Prepare 
-
 - A GUI for the web agent.
 - Web agent can be minimized to tray.
 - Allow web agent to be added to the system's startup & be minimized on boot.
@@ -127,4 +125,5 @@ This package is open-sourced software licensed under the MIT license.
 # Credit
 
 [saochishti](https://github.com/soachishti) - https://github.com/soachishti/pyScanLib
+
 [chmuche](https://github.com/chmuche) - https://github.com/ndp-systemes/pyScanLib (multi-page scan code)

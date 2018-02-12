@@ -16,9 +16,11 @@ setup(
   classifiers = [],
 )
 
-setup(
-    #options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
-    # windows = [{'script': "app.py"}],
-    console = ['app.py'],
-    #zipfile = None,
+setup_dict = dict(
+    options={'py2exe': {'bundle_files': 1, 'compressed': True, 'dll_excludes': ["MSVCP90.dll"]}},
+    windows=[{'script': "app.py", 'icon_resources': [(1, '24x24.ico')]}],
+    # console = ['app.py'],
+    zipfile=None,
 )
+setup(**setup_dict)
+setup(**setup_dict)
