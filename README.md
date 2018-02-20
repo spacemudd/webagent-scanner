@@ -119,6 +119,7 @@ appropriate response.
 
 # Roadmap
 
+- Allow user to select which scanner to choose from.
 - A GUI for the web agent.
 - Web agent can be minimized to tray.
 - Allow web agent to be added to the system's startup & be minimized on boot.
