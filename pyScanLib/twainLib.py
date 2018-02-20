@@ -123,6 +123,12 @@ class twainLib(object):
 
         return images
 
+    def detectBlankPages(self):
+        try:
+            self.scanner.SetCapability(twain.ICAP_AUTODISCARDBLANKPAGES, twain.TWTY_UINT16, False)
+        except twain.excTWCC_CAPUNSUPPORTED:
+            print "shit, it aint supported"
+
 
     def closeScanner(self):
         """ Destory 'self.scanner' class of twain module generated in setScanner function

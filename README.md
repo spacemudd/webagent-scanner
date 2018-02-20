@@ -1,3 +1,13 @@
+# Installation
+
+1. Make sure you have Python 2.7 is installed.
+2. Make sure cmd `pip` is recognized, else, add Python to your system's PATH.
+3. Download & install the [TWAIN python module](https://pypi.python.org/pypi/twain#downloads).
+4. Execute `pip install image` (responsible for serving images)
+5. Execute `pip install tornado` (responsible for opening a web server) 
+6. Execute `pip install wxPython` (responsible for the app to become a tray icon)
+7. Navigate to the project folder and execute `app.py`.
+
 # Usage
 
 1. In command prompt, navigate to the project's root and run `app.py`.

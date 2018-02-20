@@ -6,44 +6,7 @@ import tornado.ioloop
 import tornado.web
 from threading import Thread
 import base64
-import wx.adv
-import sys
-import wx
-
-TRAY_TOOLTIP = 'Scanner Web-Agent'
-TRAY_ICON = '24x24.png'
-
-class App(wx.App):
-    def OnInit(self):
-        frame = wx.Frame(None)
-        self.SetTopWindow(frame)
-        TaskBarIcon(frame)
-        return True
-
-class TaskBarIcon(wx.adv.TaskBarIcon):
-    def __init__(self, frame):
-        self.frame = frame
-        super(TaskBarIcon, self).__init__()
-        icon = wx.Icon(wx.Bitmap(TRAY_ICON))
-        self.SetIcon(icon, TRAY_TOOLTIP)
-        self.Bind(wx.adv.EVT_TASKBAR_RIGHT_DOWN, self.CreatePopupMenu)
-
-    def CreatePopupMenu(self):
-        menu = wx.Menu()
-        create_menu_item(menu, 'Exit', self.on_exit)
-        return menu
-
-    def on_exit(self, event):
-        wx.CallAfter(self.Destroy)
-        self.frame.Close()
-        tornado.ioloop.IOLoop.current().stop()
-        sys.exit()
-
-def create_menu_item(menu, label, func):
-    item = wx.MenuItem(menu, -1, label)
-    menu.Bind(wx.EVT_MENU, func, id=item.GetId())
-    menu.Append(item)
-    return item
+import sysTrayIcon
 
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
@@ -99,6 +62,7 @@ class transferCancelled(Exception):
 def scan():
     loadScanner = pyScanLib()
     devices = loadScanner.getScanners()
+    print devices
     loadScanner.setScanner(devices[0])
 
     loadScanner.setDPI(300)
@@ -122,7 +86,8 @@ def multiScan():
     """
     loadScanner = pyScanLib()
     devices = loadScanner.getScanners()
-    loadScanner.setScanner(devices[0])
+    print devices
+    loadScanner.setScanner(devices[2])
 
     loadScanner.setDPI(300)
 
@@ -155,12 +120,11 @@ class HttpServerThread(Thread):
             main()
         except(KeyboardInterrupt, SystemExit):
             raise
-        except:
-            print("Error")
-
+        # except:
+        #     print("Error")
 
 if __name__ == '__main__':
     serverThread = HttpServerThread("Connection")
     serverThread.start()
-    trayapp = App(False)
+    trayapp = sysTrayIcon.App(False)
     trayapp.MainLoop()
