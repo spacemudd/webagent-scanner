@@ -87,7 +87,7 @@ def multiScan():
     loadScanner = pyScanLib()
     devices = loadScanner.getScanners()
     print devices
-    loadScanner.setScanner(devices[2])
+    loadScanner.setScanner(devices[0])
 
     loadScanner.setDPI(300)
 
