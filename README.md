@@ -1,3 +1,7 @@
+# What is it about?
+
+Allows your web application to communicate with a scanner and receive scanned images.
+
 # Installation
 
 1. Make sure you have Python 2.7 is installed.
