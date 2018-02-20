@@ -85,19 +85,34 @@ Selects the **first** scanner the app finds and begin scanning until all papers 
 If you plan to take app.exe somewhere else, it must have the folder 'cert' next to it 
 with the certificate files.
 
+# Questions
+
+### 1. How do I set the scanner?
+
+In `app.py`, you will find the function `setScanner`, use that.
+
+### 2. Can I see a list of the scanners connected?
+
+As of now, you can't. The app takes the first scanner it can detect.
+
+Of course, you can adjust the function `setScanner` in `app.py` to select different scanner.
+
+In the future, there will be a window to choose which scanner to choose from.
+
 # Reason this repo exists
 
-Often times web-applications would benefit from the ability to connect to a scanner.
+Often times web-applications need to benefit from connecting to scanners.
 
-This is virtually impossible if we take a direct route to the scanner via a DLL located in 
-the client's computer, because a web browser does not have permission to utilize such resources.
+It's virtually impossible if we take a direct route to a scanner via DLL located on clients' computers,
+because web browsers don't have permission to utilize those resources.
 
-1. However, Internet Explorer has ActiveX features which allows you to communicate directly
-with DLLs. But that is propriety code and limited to IE, not to mention all the security 
-problems with it.
+Sometimes it is often suggested to use:
 
-2. Using Java applets, we can communicate directly with DLLs. Except, the support of Java
-applets is dying and as of lately Google totally removed the support for it, rendering it useless.
+1. **ActiveX**: Allows you to communicate directly with DLLs. It propriety code, *limited to IE*, and
+has security problems.
+
+2. **Java applets**: Communicate directly with DLLs. Except, the support of Java
+applets is dying. Chrome/FF don't support this anymore.
 
 3. Silverlight / Flash... no.
 
@@ -110,12 +125,6 @@ Based on the HTTP requests, we call the appropiate DLL or execute commands.
 **A web agent is a link between the browser and the internals of the computer.**
 
 Further read: https://wicg.github.io/webusb/ - Chrome's WebUSB API. This also limited to Chrome.
-
-# What is happening
-
-This web agent, when executed, opens a web server on port `8087`, such as navigating to
-`https://localhost:8087` will allow you to communicate with the app and return the
-appropriate response.
 
 # Roadmap
 
