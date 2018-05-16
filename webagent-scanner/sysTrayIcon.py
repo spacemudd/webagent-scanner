@@ -1,10 +1,8 @@
 import wx.adv
-import sys
 import wx
-import tornado
 
 TRAY_TOOLTIP = 'Scanner Web-Agent'
-TRAY_ICON = '24x24.png'
+TRAY_ICON = 'img/24x24.png'
 
 class App(wx.App):
     def OnInit(self):
@@ -19,7 +17,10 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
         super(TaskBarIcon, self).__init__()
         icon = wx.Icon(wx.Bitmap(TRAY_ICON))
         self.SetIcon(icon, TRAY_TOOLTIP)
-        self.Bind(wx.adv.EVT_TASKBAR_RIGHT_DOWN, self.CreatePopupMenu)
+        self.Bind(wx.adv.EVT_TASKBAR_RIGHT_DOWN, self.BuildPopupMenu)
+
+    def BuildPopupMenu(self, event):
+        self.CreatePopupMenu()
 
     def CreatePopupMenu(self):
         menu = wx.Menu()
@@ -29,7 +30,10 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
     def on_exit(self, event):
         wx.CallAfter(self.Destroy)
         self.frame.Close()
-        sys.exit()
+        raise exitingApplication
+
+class exitingApplication(BaseException):
+    pass
 
 def create_menu_item(menu, label, func):
     item = wx.MenuItem(menu, -1, label)

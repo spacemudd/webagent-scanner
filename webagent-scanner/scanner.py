@@ -25,10 +25,11 @@ class MainHandler(BaseHandler):
 
 class ScanHandler(BaseHandler):
     def get(self):
+        scannerName = self.get_argument('scanner', default=None)
         try:
-            image = scan()
+            image = scan(scannerName)
         except transferCancelled:
-            self.write('Damn!')
+            self.write('Transfer cancelled')
 
         buffer = StringIO()
         image.save(buffer, format = "jpeg")
@@ -37,35 +38,62 @@ class ScanHandler(BaseHandler):
 
 class MultiScanHandler(BaseHandler):
     def get(self):
-        images = multiScan()
+        scannerName = self.get_argument('scanner', default=None)
+        resolution = self.get_argument('resolution', default=100)
+        pixelType = self.get_argument('pixel-type', default="color")
+        duplex = self.get_argument('duplex', default="0")
+        images = multiScan(scannerName, resolution, pixelType, duplex)
         self.write(images)
 
-def make_app():
+class GetScannersHandler(BaseHandler):
+    def get(self):
+        loadScanner = pyScanLib()
+        devices = loadScanner.getScanners()
+
+        devicesDict = {}
+        for device in devices:
+            devicesDict[device] = device
+
+        self.write(devicesDict)
+
+class CloseServerHandler(BaseHandler):
+    def get(self):
+        self.write('Closing...')
+        tornado.ioloop.IOLoop.instance().stop()
+
+def buildRoutes():
     return tornado.web.Application([
         (r"/", MainHandler),
         (r"/scan", ScanHandler),
         (r"/multi-scan", MultiScanHandler),
+        (r"/get-scanners", GetScannersHandler),
+        (r"/close", CloseServerHandler),
     ])
 
-def main():
-    app = make_app()
+def openWebServer():
+    app = buildRoutes()
     server = tornado.httpserver.HTTPServer(app, ssl_options = {
             "certfile": "cert/localhost_cert.crt",
             "keyfile": "cert/localhost_cert.key",
         })
     server.listen(8087)
-    tornado.ioloop.IOLoop.current().start()
+    ioloop = tornado.ioloop.IOLoop.instance()
+    ioloop.start()
 
 class transferCancelled(Exception):
     pass
 
-def scan():
+def scan(scannerName=None):
     loadScanner = pyScanLib()
     devices = loadScanner.getScanners()
     print devices
-    loadScanner.setScanner(devices[0])
+    if scannerName:
+        loadScanner.setScanner(scannerName)
+    else:
+        loadScanner.setScanner(devices[0])
 
-    loadScanner.setDPI(300)
+
+    loadScanner.setDPI(100)
 
     # loadScanner.setScanArea(width=8.26,height=11.693) # (left,top,width,height) in inches (A4)
 
@@ -81,19 +109,28 @@ def scan():
 
     return pil
 
-def multiScan():
+def multiScan(scannerName=None, resolution=100, pixelType='color', duplex="0"):
     """ Returns a list of images (PIL in Array) scanned.
     """
+
     loadScanner = pyScanLib()
     devices = loadScanner.getScanners()
     print devices
-    loadScanner.setScanner(devices[0])
+    if scannerName:
+        loadScanner.setScanner(scannerName)
+    else:
+        loadScanner.setScanner(devices[0])
 
-    loadScanner.setDPI(300)
+    loadScanner.setDPI(resolution)
 
     #loadScanner.setScanArea(width=8.26,height=11.693) # (left,top,width,height) in inches (A4)
 
-    loadScanner.setPixelType('color') # bw/gray/color
+    loadScanner.setPixelType(pixelType) # bw/gray/color
+
+    if duplex == "0":
+        loadScanner.setDuplex(False)
+    else:
+        loadScanner.setDuplex(True)
 
     pils = loadScanner.multiScan()
 
@@ -116,15 +153,21 @@ class HttpServerThread(Thread):
         Thread.__init__(self)
         self.name = name
     def run(self):
-        try:
-            main()
-        except(KeyboardInterrupt, SystemExit):
-            raise
-        # except:
-        #     print("Error")
+        openWebServer()
+
+class TrayIconThread(Thread):
+    def __init__(self, name, tornadoThread):
+        Thread.__init__(self)
+        self.name = name
+        self.tornadoThread = tornadoThread
+    def run(self):
+        trayApp = sysTrayIcon.App(False)
+        trayApp.MainLoop()
 
 if __name__ == '__main__':
     serverThread = HttpServerThread("Connection")
     serverThread.start()
-    trayapp = sysTrayIcon.App(False)
-    trayapp.MainLoop()
+
+    trayIconThread = TrayIconThread("Tray icon", serverThread)
+    trayIconThread.start()
+

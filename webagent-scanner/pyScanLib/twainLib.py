@@ -15,6 +15,7 @@ class twainLib(object):
 
     def __init__(self):
         self.dpi = 200  # Define for use in pixeltoInch function
+        self.scannedImages = []
 
     def getScanners(self):
         """Get available scanner from twain module
@@ -81,6 +82,16 @@ class twainLib(object):
         self.scanner.SetCapability(
             twain.ICAP_PIXELTYPE, twain.TWTY_UINT16, pixelType)
 
+    def setDuplex(self, boolEnabled):
+        """ Set the duplex to be enabled or not.
+        :param enabled: Boolean
+        """
+        try:
+            self.scanner.SetCapability(twain.CAP_DUPLEXENABLED, twain.TWTY_BOOL, boolEnabled)
+        except:
+            print("Couldn't set duplex")
+
+
     def scan(self):
         """Scan and return PIL object if success else return False
         """
@@ -101,33 +112,45 @@ class twainLib(object):
         if self.scanner == None:
             raise ScannerNotSet
 
-        self.scanner.RequestAcquire(0, 1) # RequestAcquire(ShowUI, ShowModal)
-        info = self.scanner.GetImageInfo()
-        images = []
-        handles = []
         try:
-            handle, more = self.scanner.XferImageNatively()
-            handles.append(handle)
+            self.scanner.RequestAcquire(0, 0) # RequestAcquire(ShowUI, ShowModal)
+        except:
+            print("RequestAcquire Error")
+
+
+        while self.next():
+            image = self.capture()
+            if not image:
+                print("Capture didnt find any images")
+
+        return self.scannedImages
+
+    def next(self):
+        try:
+            print("next()")
+            self.scanner.GetImageInfo()
+            print("image_info()")
+            return True
+        except twain.excTWCC_SEQERROR:
+            print("next() fired an exception()")
+            return False
+
+    def capture(self):
+        try:
+            print("capture()")
+            (handle, more_to_come) = self.scanner.XferImageNatively()
         except twain.excDSTransferCancelled:
-            return []
-        while more != 0:
-            try:
-                handle, more = self.scanner.XferImageNatively()
-                handles.append(handle)
-            except twain.excDSTransferCancelled:
-                more = 0
-
-        for handle in handles:
-            images.append(Image.open(StringIO(twain.DIBToBMFile(handle))))
-            twain.GlobalHandleFree(handle)
-
-        return images
+            return None
+        self.scannedImages.append(Image.open(StringIO(twain.DIBToBMFile(handle))))
+        twain.GlobalHandleFree(handle)
+        return True
+        
 
     def detectBlankPages(self):
         try:
             self.scanner.SetCapability(twain.ICAP_AUTODISCARDBLANKPAGES, twain.TWTY_UINT16, False)
         except twain.excTWCC_CAPUNSUPPORTED:
-            print "shit, it aint supported"
+            print "Blank page detection not supported"
 
 
     def closeScanner(self):
