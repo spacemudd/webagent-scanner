@@ -110,11 +110,7 @@ In `app.py`, you will find the function `setScanner`, use that.
 
 ### 2. Can I see a list of the scanners connected?
 
-As of now, you can't. The app takes the first scanner it can detect.
-
-Of course, you can adjust the function `setScanner` in `app.py` to select different scanner.
-
-In the future, there will be a window to choose which scanner to choose from.
+Call the route `/get-scanners`.
 
 # Reason this repo exists
 
