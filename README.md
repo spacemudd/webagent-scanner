@@ -80,6 +80,19 @@ Selects the **first** scanner the app finds and begin scanning until all papers 
         'total': 10
     }
 
+> /get-scanners
+
+**Description**
+
+Gets a list of scanners detected.
+
+**Request example**
+
+    {
+        'scanner-name': 'scanner-name',
+        'scanner-name1': 'scanner-name1',
+        ...
+    }
 
 # How to build
 
