@@ -10,7 +10,9 @@ Allows your web application to communicate with a scanner and receive scanned im
 4. Execute `pip install image` (responsible for serving images)
 5. Execute `pip install tornado` (responsible for opening a web server) 
 6. Execute `pip install wxPython` (responsible for the app to become a tray icon)
-7. Navigate to the project folder and execute `app.py`.
+7. pip install http://sourceforge.net/projects/py2exe/files/latest/download?source=files
+8. `pip install .`
+9. Navigate to the project folder and execute `app.py`.
 
 # Usage
 
